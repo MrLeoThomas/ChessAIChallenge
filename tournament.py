@@ -12,6 +12,9 @@ import settings
 from engine.bot_loader import BotSpec, discover_bots
 from engine.game import Game
 
+# Default folders sit next to this file so the script works from any directory.
+PROJECT_DIR = Path(__file__).resolve().parent
+
 
 def play_game(
     white: BotSpec, black: BotSpec, timeout_seconds: float, games_dir: Path
@@ -27,8 +30,8 @@ def play_game(
 
 
 def run_tournament(
-    bot_directory: str | Path = "bots",
-    games_directory: str | Path = "games",
+    bot_directory: str | Path = PROJECT_DIR / "bots",
+    games_directory: str | Path = PROJECT_DIR / "games",
     timeout_seconds: float = settings.BOT_TIMEOUT_SECONDS,
 ) -> dict[str, float]:
     """Play all bot pairs with each bot playing both white and black."""
@@ -62,8 +65,12 @@ def run_tournament(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--bots", default="bots", help="Folder containing bot files.")
-    parser.add_argument("--games", default="games", help="Folder for saved PGN records.")
+    parser.add_argument(
+        "--bots", default=PROJECT_DIR / "bots", type=Path, help="Folder containing bot files."
+    )
+    parser.add_argument(
+        "--games", default=PROJECT_DIR / "games", type=Path, help="Folder for saved PGN records."
+    )
     parser.add_argument(
         "--timeout",
         type=float,

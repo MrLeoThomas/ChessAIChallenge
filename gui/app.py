@@ -16,6 +16,11 @@ from engine.bot_loader import BotDiscovery, BotSpec, discover_bots
 from engine.bot_runner import BotMoveResult, run_bot
 from engine.game import Game, HumanPlayer
 
+# Resolve folders from this file so the app works from any working directory.
+PROJECT_DIR = Path(__file__).resolve().parent.parent
+BOTS_DIR = PROJECT_DIR / "bots"
+GAMES_DIR = PROJECT_DIR / "games"
+
 WINDOW_WIDTH = 1000
 WINDOW_HEIGHT = 720
 BOARD_SIZE = 640
@@ -351,7 +356,7 @@ class ChessApp:
         assert self.game is not None
         if self.game.result is None or self.saved_game:
             return
-        folder = Path("games")
+        folder = GAMES_DIR
         folder.mkdir(parents=True, exist_ok=True)
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
         filename = f"game-{stamp}.pgn"
@@ -365,7 +370,7 @@ class ChessApp:
     def _save_unfinished_game(self) -> None:
         if self.game is None or self.saved_game or self.game.result is not None:
             return
-        folder = Path("games")
+        folder = GAMES_DIR
         folder.mkdir(parents=True, exist_ok=True)
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
         self.game.save_pgn(str(folder / f"game-{stamp}.pgn"), "unfinished")
@@ -646,7 +651,7 @@ class ChessApp:
 
 def run() -> None:
     """Start the graphical app and report bot-loading problems in the terminal."""
-    discovery = discover_bots("bots")
+    discovery = discover_bots(BOTS_DIR)
     for error in discovery.errors:
         print(f"Could not load {error.file_path.name}: {error.message}")
     pygame.init()
